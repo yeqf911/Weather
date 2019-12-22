@@ -32,6 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
 
     private static final int UPDATE_TODAY_WEATHER = 1;
+    private static final int UPDATE_FUTURE_WEATHER = 2;
 
     private ImageView updateViewBtn;
     private ImageView selectCityBtn;
@@ -55,13 +56,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     // 第5天
     private TextView week5T, temp5T, weather5T, wind5T;
 
-    // 第6天
-    private TextView week6T, temp6T, weather6T, wind6T;
-
-
     private ImageView weatherImg, pmImg;
 
     private List<WeatherInfo> weatherFuture;
+    private WeatherInfo weatherToday;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -69,7 +67,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case UPDATE_TODAY_WEATHER:
-                    updateWeatherVIew();
+                    updateTodayWeatherView();
+                    break;
+                case UPDATE_FUTURE_WEATHER:
+                    updateFutureWeatherView();
                     break;
                 default:
                     break;
@@ -174,16 +175,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         weather5T.setText("N/A");
         wind5T.setText("N/A");
 
-        // 第6天
-        week6T = findViewById(R.id.week6T);
-        temp6T = findViewById(R.id.temp6T);
-        weather6T = findViewById(R.id.weather6T);
-        wind6T = findViewById(R.id.wind6T);
-        week6T.setText("N/A");
-        temp6T.setText("N/A");
-        weather6T.setText("N/A");
-        wind6T.setText("N/A");
-
     }
 
     @Override
@@ -206,27 +197,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
         finish();
     }
 
-    private void updateWeatherVIew() {
-        updateTodayWeatherView();
+    private void updateFutureWeatherView() {
         updateT1();
         updateT2();
         updateT3();
         updateT4();
         updateT5();
-        updateT6();
     }
 
     @SuppressLint("SetTextI18n")
     private void updateTodayWeatherView() {
-        cityNameTv.setText(this.weatherFuture.get(0).getCitynm() + "天气");
-        cityTv.setText(this.weatherFuture.get(0).getCitynm());
-        timeTv.setText(this.weatherFuture.get(0).getDays());
-        humidityTv.setText("湿度 " + this.weatherFuture.get(0).getHumidity());
-        pmDataTv.setText(this.weatherFuture.get(0).getAqi());
-        weekTv.setText(this.weatherFuture.get(0).getWeek());
-        temperatureTv.setText(this.weatherFuture.get(0).getTemperature().replace("/", "~"));
-        weatherTv.setText(this.weatherFuture.get(0).getWeather());
-        windTv.setText(this.weatherFuture.get(0).getWind());
+        cityNameTv.setText(this.weatherToday.getCitynm() + "天气");
+        cityTv.setText(this.weatherToday.getCitynm());
+        timeTv.setText(this.weatherToday.getDays());
+        humidityTv.setText("湿度 " + this.weatherToday.getHumidity());
+        pmDataTv.setText(this.weatherToday.getAqi());
+        weekTv.setText(this.weatherToday.getWeek());
+        temperatureTv.setText(this.weatherToday.getTemperature().replace("/", "~"));
+        weatherTv.setText(this.weatherToday.getWeather());
+        windTv.setText(this.weatherToday.getWind());
     }
 
     private void updateT1() {
@@ -264,13 +253,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         wind5T.setText(this.weatherFuture.get(5).getWind());
     }
 
-    private void updateT6() {
-        week6T.setText(this.weatherFuture.get(6).getWeek());
-        temp6T.setText(this.weatherFuture.get(6).getTemperature());
-        weather6T.setText(this.weatherFuture.get(6).getWeather());
-        wind6T.setText(this.weatherFuture.get(6).getWind());
-    }
-
 
     private void updateWeather() {
 
@@ -278,6 +260,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d("myWeather", "网络OK");
             Toast.makeText(MainActivity.this, "网络OK！", Toast.LENGTH_LONG).show();
             Log.d("Weather", currentCityName);
+            getTodayWeather(currentCityName);
             getFutureWeather(currentCityName);
         } else {
             Log.d("myWeather", "网络挂了");
@@ -303,14 +286,41 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }).start();
     }
 
+    private void getTodayWeather(String city) {
+        final String url = Constant.WEATHER_TODAY + city;
+        Log.d(TAG, "getWeather: " + url);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String response = HttpClient.get(url);
+                    Log.d(TAG, "run: " + response);
+                    parseWeatherToday(response);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void parseWeatherToday(String jsonStr) {
+        Type jsonType = new TypeToken<WeatherResponse<WeatherInfo>>() {
+        }.getType();
+        WeatherResponse<WeatherInfo> weatherResponse = JsonUtil.parseJson(jsonStr, jsonType);
+        this.weatherToday = Objects.requireNonNull(weatherResponse).getResult();
+        Message msg = new Message();
+        msg.what = UPDATE_TODAY_WEATHER;
+        handler.sendMessage(msg);
+    }
+
     private void parseWeatherFuture(String jsonStr) {
         Type jsonType = new TypeToken<WeatherResponse<List<WeatherInfo>>>() {
         }.getType();
         WeatherResponse<List<WeatherInfo>> weatherResponse = JsonUtil.parseJson(jsonStr, jsonType);
         this.weatherFuture = Objects.requireNonNull(weatherResponse).getResult();
-
         Message msg = new Message();
-        msg.what = UPDATE_TODAY_WEATHER;
+        msg.what = UPDATE_FUTURE_WEATHER;
         handler.sendMessage(msg);
     }
 }

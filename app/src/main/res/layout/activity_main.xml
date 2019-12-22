@@ -435,41 +435,6 @@
                     android:textColor="@android:color/white"
                     android:text="微风"/>
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/t5"
-                android:layout_marginLeft="10dp"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/week6T"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/white"
-                    android:text="今天 星期一"/>
-                <TextView
-                    android:id="@+id/temp6T"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="20.0sp"
-                    android:text="-2℃~7℃"/>
-                <TextView
-                    android:id="@+id/weather6T"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/white"
-                    android:text="多云"/>
-                <TextView
-                    android:id="@+id/wind6T"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textColor="@android:color/white"
-                    android:text="微风"/>
-            </LinearLayout>
         </RelativeLayout>
 
     </LinearLayout>
