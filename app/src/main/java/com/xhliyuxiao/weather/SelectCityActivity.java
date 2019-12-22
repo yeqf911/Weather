@@ -58,6 +58,8 @@ public class SelectCityActivity extends AppCompatActivity implements View.OnClic
         cityTv.setText("当前城市: " + updateCityName);
 
         application = (WeatherApplication) getApplication();
+
+        // 从 application 对象中读取到城市列表数据
         cities = application.getCityList();
         arrayList = new ArrayList<>();
 
@@ -75,7 +77,6 @@ public class SelectCityActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SelectCityActivity.this.updateCityName = cities.get(i).getName();
-                ;
                 Log.d(TAG, "onItemClick: " + SelectCityActivity.this.updateCityName);
                 SelectCityActivity.this.cityTv.setText("当前城市: " + updateCityName);
             }

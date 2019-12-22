@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private ImageView selectCityBtn;
     private String currentCityName = "";
 
+    // 今天的天气相关的控件
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv, temperatureTv, weatherTv, windTv, cityNameTv;
 
 
@@ -83,13 +84,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 初始化控件
         initView();
 
+        // 这个地方是从 SelectCityActivity 获取中传过来的的数据
         currentCityName = getIntent().getStringExtra("cityName");
         if (currentCityName == null || currentCityName.length() == 0) {
             currentCityName = "杭州";
         }
 
+        // 更新界面数据
         updateWeather();
     }
 
@@ -260,7 +264,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Log.d("myWeather", "网络OK");
             Toast.makeText(MainActivity.this, "网络OK！", Toast.LENGTH_LONG).show();
             Log.d("Weather", currentCityName);
+
+            // 获取今天的天气情况
             getTodayWeather(currentCityName);
+
+            // 获取未来五天的天气情况
             getFutureWeather(currentCityName);
         } else {
             Log.d("myWeather", "网络挂了");
@@ -290,12 +298,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
         final String url = Constant.WEATHER_TODAY + city;
         Log.d(TAG, "getWeather: " + url);
 
+        // Android 网络请求不能放在主线程中，只能通过子线程做网络请求，所以这里使用的是子线程
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     String response = HttpClient.get(url);
                     Log.d(TAG, "run: " + response);
+                    // 解析返回的数据（json字符串）
                     parseWeatherToday(response);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -308,7 +318,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Type jsonType = new TypeToken<WeatherResponse<WeatherInfo>>() {
         }.getType();
         WeatherResponse<WeatherInfo> weatherResponse = JsonUtil.parseJson(jsonStr, jsonType);
-        this.weatherToday = Objects.requireNonNull(weatherResponse).getResult();
+        this.weatherToday = weatherResponse.getResult();
         Message msg = new Message();
         msg.what = UPDATE_TODAY_WEATHER;
         handler.sendMessage(msg);
@@ -318,7 +328,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         Type jsonType = new TypeToken<WeatherResponse<List<WeatherInfo>>>() {
         }.getType();
         WeatherResponse<List<WeatherInfo>> weatherResponse = JsonUtil.parseJson(jsonStr, jsonType);
-        this.weatherFuture = Objects.requireNonNull(weatherResponse).getResult();
+        this.weatherFuture = weatherResponse.getResult();
         Message msg = new Message();
         msg.what = UPDATE_FUTURE_WEATHER;
         handler.sendMessage(msg);

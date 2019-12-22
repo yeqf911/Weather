@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Type;
 
+// 解析json的帮助类
 public class JsonUtil {
 
+    // 使用Gson这个第三方库解析json数据
     private static Gson gson;
 
     public static <T> T parseJson(String json, Type type) {

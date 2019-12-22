@@ -26,6 +26,8 @@ public class WeatherApplication extends Application {
         application = this;
         sqLiteHelper = new SQLiteHelper(this, SQLiteHelper.DB_NAME, null, SQLiteHelper.VERSION);
         cityList = new ArrayList<>();
+
+        // 初始化城市的数据，就是添加10个城市
         initCityList();
     }
 
@@ -38,6 +40,7 @@ public class WeatherApplication extends Application {
         }).start();
     }
 
+    // 往 SQLite 数据库中插入10条数据
     private void insertCities() {
         SQLiteDatabase database = sqLiteHelper.getWritableDatabase();
         List<City> initCities = new ArrayList<>();
@@ -72,8 +75,11 @@ public class WeatherApplication extends Application {
     private void update() {
         Cursor cursor = sqLiteHelper.getReadableDatabase().query(SQLiteHelper.TABLE_CITY,
                 new String[]{"id", "name", "tag", "code", "province"}, null, null, null, null, null);
+
+        // 先清空 cityList
         this.cityList.clear();
 
+        // 如果数据库有数据了，就不需要初始化10条数据
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(0);
