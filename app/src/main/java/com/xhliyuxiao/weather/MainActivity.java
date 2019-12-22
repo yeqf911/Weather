@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private ImageView updateViewBtn;
     private ImageView selectCityBtn;
+    private String currentCityName = "";
 
     private TextView cityTv, timeTv, humidityTv, weekTv, pmDataTv, pmQualityTv, temperatureTv, weatherTv, windTv, cityNameTv;
 
@@ -52,7 +53,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     break;
                 default:
                     break;
-
             }
         }
     };
@@ -63,6 +63,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         initView();
+
+        currentCityName = getIntent().getStringExtra("cityName");
+        if (currentCityName == null || currentCityName.length() == 0) {
+            currentCityName = "杭州";
+        }
+
         updateWeather();
     }
 
@@ -90,7 +96,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cityTv.setText("N/A");
         timeTv.setText("N/A");
         humidityTv.setText("N/A");
-        pmQualityTv.setText("N/A");
+//        pmQualityTv.setText("N/A");
         pmDataTv.setText("N/A");
         weekTv.setText("N/A");
         temperatureTv.setText("N/A");
@@ -112,8 +118,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void startSelectCityActivity() {
         Intent intent = new Intent(this, SelectCityActivity.class);
+        intent.putExtra("cityName", this.weatherToday.getCitynm());
         startActivity(intent);
         overridePendingTransition(0, 0);
+        finish();
     }
 
     @SuppressLint("SetTextI18n")
@@ -122,7 +130,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         cityTv.setText(this.weatherToday.getCitynm());
         timeTv.setText(this.weatherToday.getDays());
         humidityTv.setText("湿度 " + this.weatherToday.getHumidity());
-        pmQualityTv.setText(this.weatherToday.getAqi());
+//        pmQualityTv.setText(this.weatherToday.getAqi());
         pmDataTv.setText(this.weatherToday.getAqi());
         weekTv.setText(this.weatherToday.getWeek());
         temperatureTv.setText(this.weatherToday.getTemperature().replace("/", "~"));
@@ -135,10 +143,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
         if (NetUtil.getNetworkState(this) != NetUtil.NETWORK_NONE) {
             Log.d("myWeather", "网络OK");
             Toast.makeText(MainActivity.this, "网络OK！", Toast.LENGTH_LONG).show();
-            SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
-            String cityCode = sharedPreferences.getString("main_city_code", "hangzhou");
-            Log.d("Weather", cityCode);
-            getTodayWeather(cityCode);
+//            SharedPreferences sharedPreferences = getSharedPreferences("config", MODE_PRIVATE);
+//            String cityCode = sharedPreferences.getString("main_city_code", "杭州");
+            Log.d("Weather", currentCityName);
+            getTodayWeather(currentCityName);
         } else {
             Log.d("myWeather", "网络挂了");
             Toast.makeText(MainActivity.this, "网络挂了！", Toast.LENGTH_LONG).show();

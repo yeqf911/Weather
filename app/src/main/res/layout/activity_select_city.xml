@@ -9,7 +9,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="45.0dp"
-        android:background="@color/colorPrimaryDark">
+        android:background="#000000">
 
         <ImageView
             android:id="@+id/title_select_city_back"
@@ -22,9 +22,25 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:gravity="center"
-            android:text="当前城市：北京"
+            android:text="当前城市: 北京"
             android:textColor="#FFFFFF"
             android:textSize="22sp">
         </TextView>
+
+        <ImageView
+            android:id="@+id/add_city_btn"
+            android:layout_width="45.0dp"
+            android:layout_height="45.0dp"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="center"
+            android:padding="14dp"
+            android:src="@mipmap/add_city_btn_back"/>
     </RelativeLayout>
+
+    <ListView
+        android:id="@+id/select_city_lv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp">
+    </ListView>
 </RelativeLayout>
